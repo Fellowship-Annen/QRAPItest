@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>GAS接続テスト</title>
+</head>
+
+<body>
+
+<h2>GAS接続テスト</h2>
+
+<button id="testButton">テスト送信</button>
+
+<p id="result">未送信</p>
+
+<script>
+
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzCCejDFlAfJV5sjxhzH7wp1-4S7oVK6s0Gru_m4QXVmSRdnnOXDcCfqeogW5GA4PFR/exec";
+
+document.getElementById("testButton").addEventListener("click", async () => {
+
+  const result = document.getElementById("result");
+
+  result.textContent = "送信中...";
+
+  try {
+
+    const response = await fetch(GAS_URL, {
+      method: "POST",
+
+      // GASとの通信を単純にするためtext/plainで送信
+      headers: {
+        "Content-Type": "text/plain"
+      },
+
+      body: JSON.stringify({
+        id: "QR-TEST-001",
+        weight: 555
+      })
+    });
+
+    const data = await response.json();
+
+    result.textContent =
+      "成功！ ID=" + data.id +
+      " / 重量=" + data.weight + "g";
+
+  } catch (error) {
+
+    result.textContent =
+      "エラー：" + error.message;
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
