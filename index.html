@@ -1,58 +1,170 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
-  <title>GAS接続テスト</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>フィラメント登録テスト</title>
 </head>
 
 <body>
 
-<h2>GAS接続テスト</h2>
+  <h2>フィラメント登録テスト</h2>
 
-<button id="testButton">テスト送信</button>
+  <p>
+    管理番号：
+    <input id="id" value="QR-TEST-002">
+  </p>
 
-<p id="result">未送信</p>
+  <p>
+    メーカー：
+    <input id="maker" value="テストメーカー">
+  </p>
+
+  <p>
+    母材：
+    <input id="base" value="PLA">
+  </p>
+
+  <p>
+    サブカテゴリ：
+    <input id="sub" value="PLA Matte">
+  </p>
+
+  <p>
+    色：
+    <input id="color" value="白">
+  </p>
+
+  <p>
+    保管場所：
+    <input id="location" value="テスト棚">
+  </p>
+
+  <p>
+    重量：
+    <input id="weight" type="number" value="1000"> g
+  </p>
+
+  <p>
+    担当：
+    <input id="person" value="テスト">
+  </p>
+
+  <p>
+    備考：
+    <input id="note" value="QR API登録テスト">
+  </p>
+
+
+  <button id="registerButton">
+    新規登録
+  </button>
+
+  <hr>
+
+  <p id="result">
+    未送信
+  </p>
+
 
 <script>
 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzCCejDFlAfJV5sjxhzH7wp1-4S7oVK6s0Gru_m4QXVmSRdnnOXDcCfqeogW5GA4PFR/exec";
+// ★ここだけ自分のGAS URLに変更してください
+const GAS_URL =
+  "https://script.google.com/macros/library/d/1YhFGNEeAnlaR_NDrruLMFEircnzieIz3SEVMByBjUSCiE73-sf8zQHoc/4";
 
-document.getElementById("testButton").addEventListener("click", async () => {
 
-  const result = document.getElementById("result");
+document
+  .getElementById("registerButton")
+  .addEventListener("click", async () => {
 
-  result.textContent = "送信中...";
+    const result =
+      document.getElementById("result");
 
-  try {
+    result.textContent = "送信中...";
 
-    const response = await fetch(GAS_URL, {
-      method: "POST",
 
-      // GASとの通信を単純にするためtext/plainで送信
-      headers: {
-        "Content-Type": "text/plain"
-      },
+    // 入力欄から値を取得
+    const data = {
 
-      body: JSON.stringify({
-        id: "QR-TEST-001",
-        weight: 555
-      })
-    });
+      action: "register",
 
-    const data = await response.json();
+      id:
+        document.getElementById("id").value,
 
-    result.textContent =
-      "成功！ ID=" + data.id +
-      " / 重量=" + data.weight + "g";
+      maker:
+        document.getElementById("maker").value,
 
-  } catch (error) {
+      base:
+        document.getElementById("base").value,
 
-    result.textContent =
-      "エラー：" + error.message;
+      sub:
+        document.getElementById("sub").value,
 
-  }
+      color:
+        document.getElementById("color").value,
 
-});
+      location:
+        document.getElementById("location").value,
+
+      weight:
+        Number(
+          document.getElementById("weight").value
+        ),
+
+      person:
+        document.getElementById("person").value,
+
+      note:
+        document.getElementById("note").value
+    };
+
+
+    try {
+
+      const response =
+        await fetch(GAS_URL, {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type": "text/plain"
+          },
+
+          body:
+            JSON.stringify(data)
+        });
+
+
+      const responseData =
+        await response.json();
+
+
+      if (responseData.ok) {
+
+        result.textContent =
+          "登録成功！ 管理番号：" +
+          responseData.id;
+
+      } else {
+
+        result.textContent =
+          "GASエラー：" +
+          responseData.error;
+
+      }
+
+
+    } catch (error) {
+
+      result.textContent =
+        "通信エラー：" +
+        error.message;
+    }
+
+  });
 
 </script>
 
